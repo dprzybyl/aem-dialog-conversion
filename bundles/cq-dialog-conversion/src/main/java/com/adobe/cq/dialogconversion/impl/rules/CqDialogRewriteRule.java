@@ -118,6 +118,9 @@ public class CqDialogRewriteRule extends AbstractDialogRewriteRule {
         if (items != null && isTabPanel(getChild(items, "tabs"))) {
             return true;
         }
+        if (items != null && isTabPanel(getChild(items, "tabPanel"))) {
+            return true;
+        }
         return false;
     }
 
@@ -138,6 +141,10 @@ public class CqDialogRewriteRule extends AbstractDialogRewriteRule {
 
         // check if there is a tab panel child called "tabs"
         Node tabs = getChild(items, "tabs");
+        if (tabs != null && isTabPanel(tabs)) {
+            return getChild(tabs, "items");
+        }
+        tabs = getChild(items, "tabPanel");
         if (tabs != null && isTabPanel(tabs)) {
             return getChild(tabs, "items");
         }
