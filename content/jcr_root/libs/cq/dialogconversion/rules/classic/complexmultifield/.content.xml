@@ -9,6 +9,7 @@
         <complexmultifield
             jcr:primaryType="nt:unstructured"
             sling:resourceType="aem-commons/touch/components/multifield"
+            _x0040_ConversionHint="rename items"
             fieldLabel="${./fieldLabel}"
             name="${./name}"
             saveAsTree="true"
