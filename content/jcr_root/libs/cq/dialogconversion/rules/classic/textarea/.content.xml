@@ -3,6 +3,7 @@
     jcr:primaryType="nt:unstructured">
     <patterns jcr:primaryType="nt:unstructured">
         <textarea/>
+        <richtext/>
     </patterns>
     <replacement
         jcr:primaryType="nt:unstructured"
