@@ -14,6 +14,7 @@
             fieldDescription="${./fieldDescription}"
             name="${./name}"
             value="${./value}"
+            defaultValue="${./defaultValue}"
             required="!${./allowBlank}"
             disabled="${./disabled}"
             emptyText="${./emptyText}"
