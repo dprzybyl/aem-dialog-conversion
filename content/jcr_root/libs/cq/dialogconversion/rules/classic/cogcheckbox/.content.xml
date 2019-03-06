@@ -15,7 +15,6 @@
             name="${./name}"
             text="${./fieldLabel}"
             value="true"
-            checked="${./defaultValue}"
-            required="!${./allowBlank}"/>
+            checked="${./defaultValue}"/>
     </replacement>
 </jcr:root>
