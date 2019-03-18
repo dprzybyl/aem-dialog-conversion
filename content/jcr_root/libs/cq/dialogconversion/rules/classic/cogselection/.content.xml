@@ -3,6 +3,7 @@
     jcr:primaryType="nt:unstructured">
     <patterns jcr:primaryType="nt:unstructured">
         <cogselection/>
+        <select/>
     </patterns>
     <replacement
         jcr:primaryType="nt:unstructured"
@@ -14,6 +15,8 @@
             fieldLabel="${./fieldLabel}"
             fieldDescription="${./fieldDescription}"
             name="${./name}"
+            disabled="${./disabled}"
+            value="[${./value},${./defaultValue}]"
             required="!${./allowBlank}">
             <datasource
                 jcr:primaryType="nt:unstructured"
