@@ -12,7 +12,7 @@
             fieldDescription="${./fieldDescription}"
             name="${./name}"
             text="[${./fieldLabel},${./boxLabel}]"
-            value="[${./inputValue},${./value}]"
+            value="true"
             disabled="${./disabled}"
             checked="${./checked}"
             cq:rewriteFinal="{Boolean}true">
