@@ -144,7 +144,7 @@ import java.util.regex.Pattern;
 public class NodeBasedRewriteRule implements DialogRewriteRule {
 
     // pattern that matches the regex for mapped properties: ${<path>}
-    private static final Pattern MAPPED_PATTERN = Pattern.compile("^(\\!{0,1})\\$\\{(\'.*?\'|.*?)(:(.+))?\\}$");
+    private static final Pattern MAPPED_PATTERN = Pattern.compile("^(\\!{0,1}\\|{0,1})\\$\\{(\'.*?\'|.*?)(:(.+))?\\}$");
 
     // special properties
     private static final String PROPERTY_RANKING = "cq:rewriteRanking";
@@ -454,8 +454,25 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
 
                     // negate boolean properties if negation character has been set
                     String negate = matcher.group(1);
-                    if ("!".equals(negate) && originalProperty.getType() == PropertyType.BOOLEAN) {
-                        newProperty.setValue(!newProperty.getBoolean());
+                    if ("!".equals(negate)) {
+                        if (originalProperty.getType() == PropertyType.BOOLEAN) {
+                            newProperty.setValue(!newProperty.getBoolean());
+                        } else if ("true".equals(newProperty.getString())) {
+                            newProperty.setValue(false);
+                        } else if ("false".equals(newProperty.getString())) {
+                            newProperty.setValue(true);
+                        }
+                    }
+
+                    if ("|".equals(matcher.group(1))) {
+                        String jsCode = newProperty.getString();
+                        String localePath = jsCode;
+                        if (jsCode.contains("COGNIFIDE.CQ.widgetHelpers.processPath")) {
+                            jsCode = jsCode.replaceAll("'", "");
+                            String[] parts = jsCode.split(",");
+                            localePath = parts[2].trim();
+                        }
+                        newProperty.setValue(localePath);
                     }
 
                     // the mapping was successful
