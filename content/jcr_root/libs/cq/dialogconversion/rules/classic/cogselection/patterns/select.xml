@@ -3,4 +3,5 @@
     jcr:primaryType="cq:Widget"
     type="select"
     xtype="selection">
+    <options jcr:primaryType="cq:WidgetCollection"/>
 </jcr:root>

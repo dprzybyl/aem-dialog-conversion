@@ -17,9 +17,11 @@
             disabled="${./disabled}"
             value="[${./value},${./defaultValue}]"
             required="!${./allowBlank}">
-            <items
+            <datasource
                 jcr:primaryType="nt:unstructured"
-                cq:rewriteMapChildren="./options"/>
+                sling:resourceType="zg/commons/components/datasource"
+                defaultValue="${./defaultValue}"
+                selector="${./options}"/>
         </cogselection>
     </replacement>
 </jcr:root>

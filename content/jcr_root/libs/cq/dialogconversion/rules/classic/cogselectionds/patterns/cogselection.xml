@@ -3,5 +3,4 @@
     jcr:primaryType="cq:Widget"
     type="select"
     xtype="cogselection">
-    <options jcr:primaryType="cq:WidgetCollection"/>
 </jcr:root>

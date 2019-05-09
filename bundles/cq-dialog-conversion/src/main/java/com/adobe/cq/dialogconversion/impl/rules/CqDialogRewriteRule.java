@@ -58,11 +58,17 @@ public class CqDialogRewriteRule extends AbstractDialogRewriteRule {
 
         if (isDesignDialog) {
             if (parent.hasNode(NN_CQ_DESIGN_DIALOG)) {
+                parent.getNode(NN_CQ_DESIGN_DIALOG).remove();
+                /* TODO
                 throw new DialogRewriteException("Could not rewrite dialog: " + NN_CQ_DESIGN_DIALOG + " node already exists");
+                */
             }
         } else {
             if (parent.hasNode(NN_CQ_DIALOG)) {
+                parent.getNode(NN_CQ_DIALOG).remove();
+                /* TODO
                 throw new DialogRewriteException("Could not rewrite dialog: " + NN_CQ_DIALOG + " node already exists");
+                */
             }
         }
 

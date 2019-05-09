@@ -136,7 +136,9 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
                 QueryManager queryManager = session.getWorkspace().getQueryManager();
                 List<Query> queries = new ArrayList<Query>();
                 queries.add(queryManager.createQuery(classicStatement, Query.JCR_SQL2));
+                /* TODO
                 queries.add(queryManager.createQuery(coral2Statement, Query.JCR_SQL2));
+                */
 
                 for (Query query : queries) {
                     NodeIterator iterator = query.execute().getNodes();
@@ -184,19 +186,23 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
                 String crxHref = externalizer.relativeLink(request, CRX_LITE_PATH) + ".jsp#" + dialogPath;
                 boolean isDesignDialog = DialogRewriteUtils.isDesignDialog(dialog);
 
+                /* TODO
                 // only allow Coral 2 backup dialogs in the result if there's a replacement
                 if (dialogType == DialogType.CORAL_2 && dialog.getName().endsWith(CORAL_2_BACKUP_SUFFIX)) {
                     if ((!isDesignDialog && !parent.hasNode(NN_CQ_DIALOG)) || (isDesignDialog && !parent.hasNode(NN_CQ_DESIGN_DIALOG))) {
                         continue;
                     }
                 }
+                */
 
                 boolean converted = false;
+                /* TODO
                 if (dialogType == DialogType.CLASSIC) {
                     converted = isDesignDialog ? parent.hasNode(NN_CQ_DESIGN_DIALOG) : parent.hasNode(NN_CQ_DIALOG);
                 } else if (dialogType == DialogType.CORAL_2) {
                     converted = dialog.getName().endsWith(CORAL_2_BACKUP_SUFFIX);
                 }
+                */
 
                 Map<String, Object> map = new HashMap<String, Object>();
                 map.put("dialogPath", dialogPath);
