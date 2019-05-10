@@ -16,6 +16,7 @@ import com.adobe.cq.dialogconversion.DialogRewriteRule;
 import com.adobe.cq.dialogconversion.DialogRewriteUtils;
 import com.day.cq.commons.jcr.JcrUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jackrabbit.JcrConstants;
 import org.apache.jackrabbit.commons.flat.TreeTraverser;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.slf4j.Logger;
@@ -153,6 +154,9 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
     private static final String PROPERTY_IS_FINAL = "cq:rewriteFinal";
     private static final String PROPERTY_COMMON_ATTRS = "cq:rewriteCommonAttrs";
     private static final String PROPERTY_RENDER_CONDITION = "cq:rewriteRenderCondition";
+    private static final String PROPERTY_REWRITE_PROPERTIES = "cq:rewriteProperties";
+    private static final String PROPERTY_ALTER_NAMES = "cq:alterNames";
+    private static final String PROPERTY_SET_NT_UNSTRUCTURED = "cq:setNtUnstructured";
 
     // special nodes
     private static final String NN_CQ_REWRITE_PROPERTIES = "cq:rewriteProperties";
@@ -364,6 +368,7 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
                     property.remove();
                     continue;
                 }
+
                 // set value from original tree in case this is a mapped property
                 Property mappedProperty = mapProperty(root, property);
 
@@ -395,6 +400,21 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
                 Node child = iterator.nextNode();
                 JcrUtil.copy(child, destination, child.getName());
             }
+
+            if (destination.hasProperty(PROPERTY_REWRITE_PROPERTIES)) {
+                destination.getProperty(PROPERTY_REWRITE_PROPERTIES).remove();
+                rewriteProperties(source, destination);
+            }
+
+            if (destination.hasProperty(PROPERTY_ALTER_NAMES)) {
+                destination.getProperty(PROPERTY_ALTER_NAMES).remove();
+                alterNames(session, mapping.getValue());
+            }
+
+            if (destination.hasProperty(PROPERTY_SET_NT_UNSTRUCTURED)) {
+                destination.getProperty(PROPERTY_SET_NT_UNSTRUCTURED).remove();
+                setNtUnstructured(session, mapping.getValue());
+            }
         }
 
         // we add the complete subtree to the final nodes
@@ -409,6 +429,43 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
         // remove original tree and return rewritten tree
         root.remove();
         return copy;
+    }
+
+    private void rewriteProperties(Node source, Node destination) throws RepositoryException {
+        PropertyIterator iter = source.getProperties();
+        while (iter.hasNext()) {
+            Property property = iter.nextProperty();
+            if (property.getDefinition().isProtected()) {
+                continue;
+            }
+            if (property.isMultiple()) {
+                destination.setProperty(property.getName(), property.getValues());
+            } else {
+                destination.setProperty(property.getName(), property.getValue());
+            }
+        }
+    }
+
+    private void setNtUnstructured(Session session, String path) throws RepositoryException {
+        Node node = session.getNode(path);
+        node.setPrimaryType(JcrConstants.NT_UNSTRUCTURED);
+        NodeIterator iter = node.getNodes();
+        while (iter.hasNext()) {
+            setNtUnstructured(session, iter.nextNode().getPath());
+        }
+    }
+
+    private void alterNames(Session session, String path) throws RepositoryException {
+        Node node = session.getNode(path);
+        if (node.hasProperty("name")) {
+            Property property = node.getProperty("name");
+            String value = property.getString().replace("./", "");
+            node.setProperty("name", value);
+        }
+        NodeIterator iter = node.getNodes();
+        while (iter.hasNext()) {
+            alterNames(session, iter.nextNode().getPath());
+        }
     }
 
     /**

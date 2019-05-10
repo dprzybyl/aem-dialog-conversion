@@ -4,6 +4,7 @@
     <patterns jcr:primaryType="nt:unstructured">
         <cogselection/>
         <select/>
+        <radio/>
     </patterns>
     <replacement
         jcr:primaryType="nt:unstructured"
@@ -19,6 +20,8 @@
             required="!${./allowBlank}">
             <items
                 jcr:primaryType="nt:unstructured"
+                cq:setNtUnstructured="{Boolean}true"
+                cq:rewriteProperties="{Boolean}true"
                 cq:rewriteMapChildren="./options"/>
         </cogselection>
     </replacement>

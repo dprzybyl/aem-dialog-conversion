@@ -4,6 +4,7 @@
     <patterns jcr:primaryType="nt:unstructured">
         <cogcheckbox/>
         <checkbox/>
+        <cogselection/>
     </patterns>
     <replacement
         jcr:primaryType="nt:unstructured"
