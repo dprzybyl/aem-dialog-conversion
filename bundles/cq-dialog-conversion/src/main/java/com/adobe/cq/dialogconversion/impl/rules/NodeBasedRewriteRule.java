@@ -33,6 +33,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -153,6 +155,8 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
     private static final String PROPERTY_IS_FINAL = "cq:rewriteFinal";
     private static final String PROPERTY_COMMON_ATTRS = "cq:rewriteCommonAttrs";
     private static final String PROPERTY_RENDER_CONDITION = "cq:rewriteRenderCondition";
+    private static final String PROPERTY_REWRITE_NAMES = "cq:rewriteNames";
+    private static final String PROPERTY_NEW_PRIMARY_TYPE = "cq:newPrimaryType";
 
     // special nodes
     private static final String NN_CQ_REWRITE_PROPERTIES = "cq:rewriteProperties";
@@ -329,6 +333,8 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
 
         // collect mappings: (node in original tree) -> (node in replacement tree)
         Map<String, String> mappings = new HashMap<String, String>();
+        List<String> rewriteNames = new ArrayList<>();
+        List<String> newPrimaryType = new ArrayList<>();
         // traverse nodes of newly copied replacement tree
         TreeTraverser traverser = new TreeTraverser(copy);
         Iterator<Node> nodeIterator = traverser.iterator();
@@ -364,6 +370,19 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
                     property.remove();
                     continue;
                 }
+
+                if (PROPERTY_REWRITE_NAMES.equals(property.getName())) {
+                    rewriteNames.add(node.getPath());
+                    property.remove();
+                    continue;
+                }
+
+                if (PROPERTY_NEW_PRIMARY_TYPE.equals(property.getName())) {
+                    newPrimaryType.add(node.getPath());
+                    property.remove();
+                    continue;
+                }
+
                 // set value from original tree in case this is a mapped property
                 Property mappedProperty = mapProperty(root, property);
 
@@ -397,6 +416,9 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
             }
         }
 
+        newPrimaryType.forEach(path -> newPrimaryTypeRecursive(session, path));
+        rewriteNames.forEach(path -> rewriteNamesRecursive(session, path));
+
         // we add the complete subtree to the final nodes
         if (treeIsFinal) {
             traverser = new TreeTraverser(copy);
@@ -409,6 +431,36 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
         // remove original tree and return rewritten tree
         root.remove();
         return copy;
+    }
+
+    private void newPrimaryTypeRecursive(Session session, String path) {
+        try {
+            Node node = session.getNode(path);
+            node.setPrimaryType("nt:unstructured");
+            NodeIterator iter = node.getNodes();
+            while (iter.hasNext()) {
+                newPrimaryTypeRecursive(session, iter.nextNode().getPath());
+            }
+        } catch (RepositoryException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void rewriteNamesRecursive(Session session, String path) {
+        try {
+            Node node = session.getNode(path);
+            if (node.hasProperty("name")) {
+                Property property = node.getProperty("name");
+                String value = property.getString().replace("./", "");
+                node.setProperty("name", value);
+            }
+            NodeIterator iter = node.getNodes();
+            while (iter.hasNext()) {
+                rewriteNamesRecursive(session, iter.nextNode().getPath());
+            }
+        } catch (RepositoryException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
