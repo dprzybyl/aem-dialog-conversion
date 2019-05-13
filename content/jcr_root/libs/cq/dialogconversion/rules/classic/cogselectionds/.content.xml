@@ -15,7 +15,6 @@
             fieldDescription="${./fieldDescription}"
             name="${./name}"
             disabled="${./disabled}"
-            value="[${./value},${./defaultValue}]"
             required="!${./allowBlank}">
             <datasource
                 jcr:primaryType="nt:unstructured"

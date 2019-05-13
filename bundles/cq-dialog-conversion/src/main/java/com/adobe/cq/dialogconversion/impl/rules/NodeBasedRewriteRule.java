@@ -14,10 +14,12 @@ package com.adobe.cq.dialogconversion.impl.rules;
 import com.adobe.cq.dialogconversion.DialogRewriteException;
 import com.adobe.cq.dialogconversion.DialogRewriteRule;
 import com.adobe.cq.dialogconversion.DialogRewriteUtils;
+import com.day.cq.commons.PathInfo;
 import com.day.cq.commons.jcr.JcrUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.jackrabbit.JcrConstants;
 import org.apache.jackrabbit.commons.flat.TreeTraverser;
+import org.apache.sling.api.request.RequestPathInfo;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,9 +156,10 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
     private static final String PROPERTY_IS_FINAL = "cq:rewriteFinal";
     private static final String PROPERTY_COMMON_ATTRS = "cq:rewriteCommonAttrs";
     private static final String PROPERTY_RENDER_CONDITION = "cq:rewriteRenderCondition";
-    private static final String PROPERTY_REWRITE_PROPERTIES = "cq:rewriteProperties";
+    private static final String PROPERTY_COPY_IF_CQ_INCLUDE = "cq:copyIfCqInclude";
     private static final String PROPERTY_ALTER_NAMES = "cq:alterNames";
     private static final String PROPERTY_SET_NT_UNSTRUCTURED = "cq:setNtUnstructured";
+    private static final String PROPERTY_SET_DEFAULT_VALUE = "cq:setDefaultValue";
 
     // special nodes
     private static final String NN_CQ_REWRITE_PROPERTIES = "cq:rewriteProperties";
@@ -401,9 +404,9 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
                 JcrUtil.copy(child, destination, child.getName());
             }
 
-            if (destination.hasProperty(PROPERTY_REWRITE_PROPERTIES)) {
-                destination.getProperty(PROPERTY_REWRITE_PROPERTIES).remove();
-                rewriteProperties(source, destination);
+            if (destination.hasProperty(PROPERTY_COPY_IF_CQ_INCLUDE)) {
+                destination.getProperty(PROPERTY_COPY_IF_CQ_INCLUDE).remove();
+                copyIfCqInclude(session, source, destination);
             }
 
             if (destination.hasProperty(PROPERTY_ALTER_NAMES)) {
@@ -414,6 +417,12 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
             if (destination.hasProperty(PROPERTY_SET_NT_UNSTRUCTURED)) {
                 destination.getProperty(PROPERTY_SET_NT_UNSTRUCTURED).remove();
                 setNtUnstructured(session, mapping.getValue());
+            }
+
+            if (destination.hasProperty(PROPERTY_SET_DEFAULT_VALUE)) {
+                String defaultValue = destination.getProperty(PROPERTY_SET_DEFAULT_VALUE).getString();
+                destination.getProperty(PROPERTY_SET_DEFAULT_VALUE).remove();
+                setDefaultValue(destination, defaultValue);
             }
         }
 
@@ -431,17 +440,15 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
         return copy;
     }
 
-    private void rewriteProperties(Node source, Node destination) throws RepositoryException {
-        PropertyIterator iter = source.getProperties();
-        while (iter.hasNext()) {
-            Property property = iter.nextProperty();
-            if (property.getDefinition().isProtected()) {
-                continue;
-            }
-            if (property.isMultiple()) {
-                destination.setProperty(property.getName(), property.getValues());
-            } else {
-                destination.setProperty(property.getName(), property.getValue());
+    private void copyIfCqInclude(Session session, Node root, Node destination) throws RepositoryException {
+        if (DialogRewriteUtils.hasXtype(root, "cqinclude")) {
+            RequestPathInfo info = new PathInfo(root.getProperty("path").getString());
+            String path = info.getResourcePath();
+            Node source = session.getNode(path);
+            NodeIterator iter = source.getNodes();
+            while (iter.hasNext()) {
+                Node child = iter.nextNode();
+                JcrUtil.copy(child, destination, child.getName());
             }
         }
     }
@@ -458,13 +465,27 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
     private void alterNames(Session session, String path) throws RepositoryException {
         Node node = session.getNode(path);
         if (node.hasProperty("name")) {
-            Property property = node.getProperty("name");
-            String value = property.getString().replace("./", "");
+            String value = node.getProperty("name").getString().replace("./", "");
             node.setProperty("name", value);
         }
         NodeIterator iter = node.getNodes();
         while (iter.hasNext()) {
             alterNames(session, iter.nextNode().getPath());
+        }
+    }
+
+
+    private void setDefaultValue(Node root, String defaultValue) throws RepositoryException {
+        NodeIterator iter = root.getNodes();
+        while (iter.hasNext()) {
+            Node node = iter.nextNode();
+            if (node.hasProperty("value")) {
+                String value = node.getProperty("value").getString();
+                if (value.equals(defaultValue)) {
+                    node.setProperty("selected", true);
+                    break;
+                }
+            }
         }
     }
 

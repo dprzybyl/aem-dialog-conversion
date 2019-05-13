@@ -16,12 +16,12 @@
             fieldDescription="${./fieldDescription}"
             name="${./name}"
             disabled="${./disabled}"
-            value="[${./value},${./defaultValue}]"
             required="!${./allowBlank}">
             <items
                 jcr:primaryType="nt:unstructured"
                 cq:setNtUnstructured="{Boolean}true"
-                cq:rewriteProperties="{Boolean}true"
+                cq:copyIfCqInclude="{Boolean}true"
+                cq:setDefaultValue="[${./value},${./defaultValue}]"
                 cq:rewriteMapChildren="./options"/>
         </cogselection>
     </replacement>
