@@ -14,7 +14,7 @@
             sling:resourceType="granite/ui/components/coral/foundation/form/checkbox"
             fieldDescription="${./fieldDescription}"
             name="${./name}"
-            text="${./fieldLabel}"
+            text="[${./fieldLabel},${./boxLabel}]"
             value="true"
             checked="${./defaultValue}"/>
     </replacement>
