@@ -10,7 +10,7 @@
         <pathfield
             jcr:primaryType="nt:unstructured"
             sling:resourceType="granite/ui/components/foundation/form/pathbrowser"
-            localePath="|${./processPath}"
+            localePath="p|${./processPath}"
             fieldLabel="${./fieldLabel}"
             fieldDescription="${./fieldDescription}"
             name="${./name}"

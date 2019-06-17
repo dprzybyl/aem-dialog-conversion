@@ -147,7 +147,7 @@ import java.util.regex.Pattern;
 public class NodeBasedRewriteRule implements DialogRewriteRule {
 
     // pattern that matches the regex for mapped properties: ${<path>}
-    private static final Pattern MAPPED_PATTERN = Pattern.compile("^(\\!{0,1}\\|{0,1})\\$\\{(\'.*?\'|.*?)(:(.+))?\\}$");
+    private static final Pattern MAPPED_PATTERN = Pattern.compile("^(\\!{0,1}[psq]{0,1}\\|{0,1})\\$\\{(\'.*?\'|.*?)(:(.+))?\\}$");
 
     // special properties
     private static final String PROPERTY_RANKING = "cq:rewriteRanking";
@@ -542,7 +542,7 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
                         }
                     }
 
-                    if ("|".equals(matcher.group(1))) {
+                    if ("p|".equals(matcher.group(1))) {
                         String jsCode = newProperty.getString();
                         String localePath = jsCode;
                         if (jsCode.contains("COGNIFIDE.CQ.widgetHelpers.processPath")) {
@@ -551,6 +551,21 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
                             localePath = parts[2].trim();
                         }
                         newProperty.setValue(localePath);
+                    }
+
+                    if ("s|".equals(matcher.group(1))) {
+                        String options = newProperty.getString();
+                        String selector = StringUtils.substringBetween(options, "$PATH.", ".json");
+                        newProperty.setValue(selector);
+                    }
+
+                    if ("q|".equals(matcher.group(1))) {
+                        String options = newProperty.getString();
+                        String queryString = StringUtils.substringAfter(options, "?");
+                        if (queryString.equals("")) {
+                            queryString = null;
+                        }
+                        newProperty.setValue(queryString);
                     }
 
                     // the mapping was successful

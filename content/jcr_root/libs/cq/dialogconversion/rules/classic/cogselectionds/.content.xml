@@ -20,7 +20,8 @@
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="zg/commons/components/datasource"
                 defaultValue="${./defaultValue}"
-                selector="${./options}"/>
+                selector="s|${./options}"
+                queryString="q|${./options}"/>
         </cogselection>
     </replacement>
 </jcr:root>
