@@ -18,6 +18,6 @@
             required="!${./allowBlank}"
             disabled="${./disabled}"
             emptyText="${./emptyText}"
-            rootPath="${./rootPath}"/>
+            rootPath="${./rootPath:/content}"/>
     </replacement>
 </jcr:root>

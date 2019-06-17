@@ -21,7 +21,7 @@
                 multiple="{Boolean}false"
                 name="${./name}"
                 sizeLimit="100"
-                title="Image"
+                title="${./title}"
                 uploadUrl="${suffix.path}"
                 useHTML5="{Boolean}true"
                 required="{Boolean}false"/>
