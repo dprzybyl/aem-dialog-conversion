@@ -3,6 +3,7 @@
     jcr:primaryType="nt:unstructured">
     <patterns jcr:primaryType="nt:unstructured">
         <richtext/>
+        <tableedit2/>
     </patterns>
     <replacement
         jcr:primaryType="nt:unstructured"

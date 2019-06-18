@@ -5,6 +5,7 @@
         <componenttab/>
         <variantsselection/>
         <channelstab/>
+        <analyticstab/>
     </patterns>
     <replacement jcr:primaryType="nt:unstructured">
     </replacement>
